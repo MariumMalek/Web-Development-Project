@@ -1,3 +1,0 @@
-#mern project
-
-#1
