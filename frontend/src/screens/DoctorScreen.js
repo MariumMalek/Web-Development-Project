@@ -19,7 +19,7 @@ const reducer = (state, action) => {
     case 'FETCH_REQUEST':
       return { ...state, loading: true };
     case 'FETCH_SUCCESS':
-      return { ...state, product: action.payload, loading: false };
+      return { ...state, doctor: action.payload, loading: false };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
     default:
@@ -27,12 +27,12 @@ const reducer = (state, action) => {
   }
 };
 
-function ProductScreen() {
+function DoctorScreen() {
   const navigate = useNavigate();
   const params = useParams();
   const { slug } = params;
-  const [{ loading, error, product }, dispatch] = useReducer(reducer, {
-    product: [],
+  const [{ loading, error, doctor }, dispatch] = useReducer(reducer, {
+    doctor: [],
     loading: true,
     error: '',
   });
@@ -40,7 +40,7 @@ function ProductScreen() {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
       try {
-        const result = await axios.get(`/api/products/slug/${slug}`);
+        const result = await axios.get(`/api/doctors/slug/${slug}`);
         dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
@@ -52,16 +52,16 @@ function ProductScreen() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart } = state;
   const addToCartHandler = async () => {
-    const existItem = cart.cartItems.find((x) => x._id === product._id);
+    const existItem = cart.cartItems.find((x) => x._id === doctor._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
-    const { data } = await axios.get(`/api/products/${product._id}`);
+    const { data } = await axios.get(`/api/doctors/${doctor._id}`);
     if (data.countInStock < quantity) {
-      window.alert('Sorry. Product is out of stock');
+      window.alert('Sorry. Doctor is out of stock');
       return;
     }
     ctxDispatch({
       type: 'CART_ADD_ITEM',
-      payload: { ...product, quantity },
+      payload: { ...doctor, quantity },
     });
     navigate('/cart');
   };
@@ -76,28 +76,28 @@ function ProductScreen() {
         <Col md={6}>
           <img
             className="img-large"
-            src={product.image}
-            alt={product.name}
+            src={doctor.image}
+            alt={doctor.name}
           ></img>
         </Col>
         <Col md={3}>
           <ListGroup variant="flush">
             <ListGroup.Item>
               <Helmet>
-                <title>{product.name}</title>
+                <title>{doctor.name}</title>
               </Helmet>
-              <h1>{product.name}</h1>
+              <h1>{doctor.name}</h1>
             </ListGroup.Item>
             <ListGroup.Item>
               <Rating
-                rating={product.rating}
-                numReviews={product.numReviews}
+                rating={doctor.rating}
+                numReviews={doctor.numReviews}
               ></Rating>
             </ListGroup.Item>
-            <ListGroup.Item>Pirce : ${product.price}</ListGroup.Item>
+            <ListGroup.Item>Category : {doctor.category}</ListGroup.Item>
             <ListGroup.Item>
               Description:
-              <p>{product.description}</p>
+              <p>{doctor.description}</p>
             </ListGroup.Item>
           </ListGroup>
         </Col>
@@ -108,15 +108,15 @@ function ProductScreen() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Price:</Col>
-                    <Col>${product.price}</Col>
+                    <Col>${doctor.price}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Status:</Col>
                     <Col>
-                      {product.countInStock > 0 ? (
-                        <Badge bg="success">In Stock</Badge>
+                      {doctor.available > 0 ? (
+                        <Badge bg="success">Available</Badge>
                       ) : (
                         <Badge bg="danger">Unavailable</Badge>
                       )}
@@ -124,11 +124,11 @@ function ProductScreen() {
                   </Row>
                 </ListGroup.Item>
 
-                {product.countInStock > 0 && (
+                {doctor.available > 0 && (
                   <ListGroup.Item>
                     <div className="d-grid">
                     <Button onClick={addToCartHandler} variant="primary">
-                        Add to Cart
+                    Appointment
                       </Button>
                     </div>
                   </ListGroup.Item>
@@ -141,4 +141,4 @@ function ProductScreen() {
     </div>
   );
 }
-export default ProductScreen;
+export default DoctorScreen;

@@ -3,7 +3,7 @@ import axios from 'axios';
 import logger from 'use-reducer-logger';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Product from '../components/Product';
+import Doctor from '../components/Doctor';
 import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
@@ -14,7 +14,7 @@ const reducer = (state, action) => {
     case 'FETCH_REQUEST':
       return { ...state, loading: true };
     case 'FETCH_SUCCESS':
-      return { ...state, products: action.payload, loading: false };
+      return { ...state, doctors: action.payload, loading: false };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
     default:
@@ -22,25 +22,25 @@ const reducer = (state, action) => {
   }
 };
 
-function HomeScreen() {
-  const [{ loading, error, products }, dispatch] = useReducer(logger(reducer), {
-    products: [],
+function DoctorHomeScreen() {
+  const [{ loading, error, doctors }, dispatch] = useReducer(logger(reducer), {
+    doctors: [],
     loading: true,
     error: '',
   });
-  // const [products, setProducts] = useState([]);
+  // const [doctors, setDoctors] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       
       dispatch({ type: 'FETCH_REQUEST' });
       try {
-        const result = await axios.get('/api/products');
+        const result = await axios.get('/api/doctors');
         dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: err.message });
       }
 
-      // setProducts(result.data);
+      // setDoctors(result.data);
     };
     fetchData();
   }, []);
@@ -49,8 +49,8 @@ function HomeScreen() {
       <Helmet>
         <title>Medicine Shop</title>
       </Helmet>
-      <h1>Featured Products</h1>
-      <div className="products">
+      <h1>Featured Doctors</h1>
+      <div className="doctors">
         
         {loading ? (
           <LoadingBox />
@@ -58,9 +58,9 @@ function HomeScreen() {
           <MessageBox variant="danger">{error}</MessageBox>
         ) : (
           <Row>
-            {products.map((product) => (
-              <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
-                <Product product={product}></Product>
+            {doctors.map((doctor) => (
+              <Col key={doctor.slug} sm={6} md={4} lg={3} className="mb-3">
+                <Doctor doctor={doctor}></Doctor>
               </Col>
             ))}
           </Row>
@@ -70,4 +70,4 @@ function HomeScreen() {
     </div>
   );
 }
-export default HomeScreen;
+export default DoctorHomeScreen;
